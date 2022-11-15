@@ -4,9 +4,13 @@
   "version": "2.0.0",
   "description": "",
   "dependencies": {
+    "functional-game-utils": "^2.5.0",
     "parcel": "^2.0.0",
+    "ramda": "^0.28.0",
+    "ramda-adjunct": "^3.3.0",
     "react": "^16.13.1",
-    "react-dom": "^16.13.1"
+    "react-dom": "^16.13.1",
+    "styled-components": "^5.3.6"
   },
   "devDependencies": {},
   "scripts": {
