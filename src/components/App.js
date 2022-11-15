@@ -64,13 +64,42 @@ const App = () => {
   const [revealed, setRevealed] = useState([]);
 
   useEffect(() => {
-    const areBothLocationsClicked =
-      firstClickedLocation.row !== -1 && secondClickedLocation.row !== -1;
+    const evaluate = async () => {
+      const isFirstClicked = firstClickedLocation.row !== -1;
+      const isSecondClicked = secondClickedLocation.row !== -1;
+      const areBothLocationsClicked = isFirstClicked && isSecondClicked;
 
-    if (areBothLocationsClicked) {
-      const evaluate = async () => {
-        const firstValue = getLocation(tiles, firstClickedLocation);
-        const secondValue = getLocation(tiles, secondClickedLocation);
+      let firstValue;
+      let secondValue;
+
+      if (isFirstClicked) {
+        firstValue = getLocation(tiles, firstClickedLocation);
+      }
+
+      if (isSecondClicked) {
+        secondValue = getLocation(tiles, secondClickedLocation);
+      }
+
+      if (
+        firstValue?.character === "fredric" ||
+        secondValue?.character === "fredric"
+      ) {
+        await wait(500);
+
+        alert("hHhahahah!");
+        setFirstClickedLocation(UNSELECTED);
+        setSecondClickedLocation(UNSELECTED);
+
+        const endIndex = revealed.length - 2;
+        if (endIndex >= 0) {
+          setRevealed(revealed.slice(0, endIndex));
+        }
+        return;
+      }
+
+      if (areBothLocationsClicked) {
+        await wait(500);
+
         const areLocationsSame = firstValue.character === secondValue.character;
 
         if (areLocationsSame) {
@@ -83,10 +112,10 @@ const App = () => {
 
         setFirstClickedLocation(UNSELECTED);
         setSecondClickedLocation(UNSELECTED);
-      };
+      }
+    };
 
-      setTimeout(evaluate, 500);
-    }
+    evaluate();
   }, [firstClickedLocation, secondClickedLocation]);
 
   return (
