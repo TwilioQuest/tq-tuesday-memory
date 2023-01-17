@@ -54,6 +54,7 @@ const Card = styled.img`
   width: ${(props) => `${props.theme.imageSize}px`};
   height: ${(props) => `${props.theme.imageSize}px`};
   image-rendering: pixelated;
+  object-fit: contain;
 `;
 
 const UNSELECTED = {
