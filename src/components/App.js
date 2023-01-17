@@ -5,11 +5,16 @@ import {
   compareLocations,
   constructMatrix,
   getLocation,
+  updateMatrix,
 } from "functional-game-utils";
 import characters from "../data/characters";
 import shield from "../../assets/images/shield.png";
 import shuffle from "../utils/shuffle";
 import wait from "../utils/wait";
+import usePrevious from "../utils/usePrevious";
+import getAllMatrixLocations from "../utils/getAllMatrixLocations";
+
+const fredricShufflePenalty = false;
 
 const theme = {
   tileSize: 128,
@@ -62,6 +67,7 @@ const App = () => {
   const [secondClickedLocation, setSecondClickedLocation] =
     useState(UNSELECTED);
   const [revealed, setRevealed] = useState([]);
+  const prevRevealed = usePrevious(revealed);
 
   useEffect(() => {
     const evaluate = async () => {
@@ -103,8 +109,11 @@ const App = () => {
         const areLocationsSame = firstValue.character === secondValue.character;
 
         if (areLocationsSame) {
-          revealed.push(firstClickedLocation);
-          revealed.push(secondClickedLocation);
+          setRevealed([
+            ...revealed,
+            firstClickedLocation,
+            secondClickedLocation,
+          ]);
         } else {
         }
 
@@ -117,6 +126,37 @@ const App = () => {
 
     evaluate();
   }, [firstClickedLocation, secondClickedLocation]);
+
+  useEffect(() => {
+    if (!fredricShufflePenalty) {
+      return;
+    }
+
+    if (prevRevealed.length > revealed.length) {
+      const allMatrixLocations = getAllMatrixLocations(tiles);
+
+      const doesRevealedContainLocation = (matrixLocation) =>
+        revealed.some((revealedLocation) =>
+          compareLocations(revealedLocation, matrixLocation)
+        );
+
+      const unRevealedLocations = allMatrixLocations.filter(
+        (matrixLocation) => !doesRevealedContainLocation(matrixLocation)
+      );
+
+      const unRevealedValues = unRevealedLocations.map((location) =>
+        getLocation(tiles, location)
+      );
+      const shuffledValues = shuffle(unRevealedValues);
+
+      let newTiles = JSON.parse(JSON.stringify(tiles));
+      unRevealedLocations.forEach((location, index) => {
+        newTiles = updateMatrix(location, shuffledValues[index], newTiles);
+      });
+
+      setTiles(newTiles);
+    }
+  }, [revealed]);
 
   return (
     <ThemeProvider theme={theme}>
